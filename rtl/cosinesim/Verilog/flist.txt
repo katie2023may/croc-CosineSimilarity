@@ -1,0 +1,6 @@
+floatingAddition.v
+floatingDivision.v
+floatingMult.v
+floatingSqrt.v
+cosine_sim.sv
+tb_cosine_sim.sv
