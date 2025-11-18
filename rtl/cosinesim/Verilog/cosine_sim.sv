@@ -21,44 +21,45 @@
     // TODO: Instatitate IP modules
     // TODO: Add additional reg/wire if needed
     
-
-    
     //Internal reg. for intermediate calc. INPUT/OUTPUT
     logic [31:0] add_o;
+    logic [31:0] dot_prod_accum;
     logic [31:0] dot_prod_o;
+    logic [31:0] mag_a, mag_b;
+    logic [31:0] mag_a_sqrt, mag_b_sqrt; 
     logic [31:0] mag_a_o, mag_b_o;
     logic [31:0] mag_a_sqrt_o, mag_b_sqrt_o;
 
     /******************** Instantiating COMPUTING modules *******************************/
 
-// Multiplier for dot product (a[i] * b[i])
+    // Multiplier for dot product (a[i] * b[i])
     multiplier u_mult_dot (.a(vec_a[index]),.b(vec_b[index]),.out(dot_prod_o));  
 
-// Multiplier for magnitude of A (a[i] * a[i])
+    // Multiplier for magnitude of A (a[i] * a[i])
     multiplier u_mult_mag_a (.a(vec_a[index]),.b(vec_a[index]),.out(mag_a_o));
 
-// Multiplier for magnitude of B (b[i] * b[i])
+    // Multiplier for magnitude of B (b[i] * b[i])
     multiplier u_mult_mag_b (.a(vec_b[index]),.b(vec_b[index]),.out(mag_b_o));
 
-// Adder for dot product accumulation
-    adder u_add_dot (.a(dot_prod),.b(dot_prod_o),.out(add_o));
+    // Adder for dot product accumulation
+    adder u_add_dot (.a(dot_prod),.b(dot_prod_o),.out(dot_prod_accum));
 
-// Adder for magnitude A accumulation
-    adder u_add_mag_a (.a(mag_a),.b(mag_a_o),.out(add_o));
+    // Adder for magnitude A accumulation
+    adder u_add_mag_a (.a(mag_a),.b(mag_a_o),.out(mag_a_accum));
 
-// Adder for magnitude B accumulation
-    adder u_add_mag_b (.a(mag_b),.b(mag_b_o),.out(add_o));
+    // Adder for magnitude B accumulation
+    adder u_add_mag_b (.a(mag_b),.b(mag_b_o),.out(mag_b_accum));
 
-// Square root for magnitude A
-    sqrt u_sqrt_a (.in(mag_a),.out(mag_a_sqrt_o));
+    // Square root for magnitude A
+    sqrt u_sqrt_a (.in(mag_a_accum),.out(mag_a_sqrt_o));
 
-// Square root for magnitude B
-    sqrt u_sqrt_b (.in(mag_b),.out(mag_b_sqrt_o));
+    // Square root for magnitude B
+    sqrt u_sqrt_b (.in(mag_b_accum),.out(mag_b_sqrt_o));
 
-// Multiplier for denominator (sqrtA * sqrtB)
+    // Multiplier for denominator (sqrtA * sqrtB)
     multiplier u_mult_den (.a(mag_a_sqrt),.b(mag_b_sqrt),.out(den_o));
 
-// Divider for final similarity
+    // Divider for final similarity
     divider u_div (.num(dot_prod),.den(den_o),.out(div_o));
 
 
@@ -97,27 +98,40 @@
 
             // TODO: Write the seq. logic for each state for each computation step (dot, mag, sqrt, div)
             case (state)
-                IDLE : index <= 3'd0;   // Reset index
-
+		IDLE : begin 
+		       	index <= 3'd0;   // Reset index
+			dot_prod <= 32'd0;
+			mag_a <= 32'd0;
+			mag_b <= 32'd0;
+		end
                 DOT : begin
                     // TODO: Update the I/O of dot_prod modueland increment index
+		    dot_prod <= dot_prod_accum;
+		    index <= index + 1;
                 end
 
                 MAG_A : begin
                     // TODO: Update the I/O of vecA_Mag module and increment index
-                end
+                    mag_a <= mag_a_accum;
+		    index <= index + 1;
+	        end
 
                 MAB_B : begin
                     // TODO: Update the I/O of vecB_Mag module and incr. index
-                end
+                    mag_b <= mag_b_accum;
+		    index <= index + 1;
+	       end
 
                 SQRT : begin
                     // TODO: Update the I/O of the sqrt module and incr. index
-                end
+                    mag_a_sqrt <= mag_a_sqrt_o;
+		    mag_b_sqrt <= mag_b_sqrt_o;
+	            index = index + 1; 
+	        end
 
                 DIV : begin
                     // TODO: Update the I/O of the div module and incr. index
-                    // similarity <= div_result;                // Output update
+                    similarity <= div_result;                // Output update
                 end
 
                 DONE : valid <= 1'b1;   // Assert valid --> Compuation = DONE
@@ -133,14 +147,31 @@
     // FSM: Comb. logic for next state
     always_comb begin
         case (state)
-            IDLE : next_state = (start == 1'b1)? DOT : IDLE;
-            DOT : next_state = (index == W-1)? MAG_A : DOT;
-            MAG_A : next_state = (index == W-1)? MAG_B : MAG_B;
-            MAG_B : next_state = (index == W-1)? SQRT : MAG_B;
-            SQRT : next_state = DIV;
-            DIV : next_state = DONE;
-            DONE : next_state = IDLE;
-            default : nxt_state = IDLE;
+		IDLE : begin
+			next_state = (start == 1'b1)? DOT : IDLE;
+		end
+		DOT : begin
+		        next_state = (index == W-1)? MAG_A : DOT;
+			if (next_state == MAG_A) index = 0;
+		end
+		MAG_A : begin
+		       	next_state = (index == W-1)? MAG_B : MAG_A;
+			if (next_state == MAG_B) index = 0;
+		end
+		MAG_B : begin
+		       	next_state = (index == W-1)? SQRT : MAG_B;
+			if (next_state == ) index = 0;
+		end
+		SQRT : begin 
+			next_state = DIV;
+		end
+		DIV : begin 
+			next_state = DONE;
+		end
+		DONE : begin 
+			next_state = IDLE;
+		end
+            default : next_state = IDLE;
         endcase
     end
 
