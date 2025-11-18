@@ -1,7 +1,8 @@
 `timescale 1ns / 1ps
 
 module FloatingDivision#(parameter XLEN=32)
-                        (input [XLEN-1:0]A,
+                        (input clk,
+			 input [XLEN-1:0]A,
                          input [XLEN-1:0]B,
                          output zero_division,
                          output [XLEN-1:0] result);

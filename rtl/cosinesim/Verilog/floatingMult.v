@@ -2,16 +2,18 @@
 module FloatingMultiplication #(parameter XLEN=32)
                                 (input [XLEN-1:0]A,
                                  input [XLEN-1:0]B,
+				 input clk,
                                  output [XLEN-1:0] result);
 
 wire [23:0] A_Mantissa = {1'b1, A[22:0]}, B_Mantissa = {1'b1, B[22:0]};
 wire [7:0] A_Exponent = A[30:23], B_Exponent = B[30:23];
 wire A_sign = A[31], B_sign = B[31];
 
-wire [22:0] Mantissa = Temp_Mantissa[45:23];  // highest bits of Temp_Mantissa, except for 1 carry bit (which causes bitshift)
 reg [47:0] Temp_Mantissa;
+wire [22:0] Mantissa = Temp_Mantissa[45:23];  // highest bits of Temp_Mantissa, except for 1 carry bit (which causes bitshift)
+
 reg [8:0] Temp_Exponent;  // one bit bigger because of potential overflow
-wire [7:0] Exponent = Temp_Exponent[7:0];
+reg [7:0] Exponent = Temp_Exponent[7:0];
 reg Sign;
 
 assign result = {Sign, Exponent, Mantissa};

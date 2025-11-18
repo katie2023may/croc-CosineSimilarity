@@ -2,7 +2,7 @@
 
     `timescale 1ns / 1ps
 
-    module cosime_sim #(
+    module cosine_sim #(
         parameter W = 5                         // Width of the input vectors
     ) (
         input logic clk,                        // Clock signal
@@ -35,34 +35,34 @@
     /******************** Instantiating COMPUTING modules *******************************/
 
     // Multiplier for dot product (a[i] * b[i])
-    multiplier u_mult_dot (.a(vec_a[index]),.b(vec_b[index]),.out(dot_prod_o));  
+    FloatingMultiplication #(.XLEN(32)) u_mult_dot (.A(vec_a[index]),.B(vec_b[index]),.result(dot_prod_o), .clk(clk)); 
 
     // Multiplier for magnitude of A (a[i] * a[i])
-    multiplier u_mult_mag_a (.a(vec_a[index]),.b(vec_a[index]),.out(mag_a_o));
+    FloatingMultiplication #(.XLEN(32)) u_mult_mag_a (.A(vec_a[index]),.B(vec_a[index]),.result(mag_a_o), .clk(clk));
 
     // Multiplier for magnitude of B (b[i] * b[i])
-    multiplier u_mult_mag_b (.a(vec_b[index]),.b(vec_b[index]),.out(mag_b_o));
+    FloatingMultiplication #(.XLEN(32)) u_mult_mag_b (.A(vec_b[index]),.B(vec_b[index]),.result(mag_b_o), .clk(clk));
 
     // Adder for dot product accumulation
-    adder u_add_dot (.a(dot_prod),.b(dot_prod_o),.out(dot_prod_accum));
+    FloatingAddition #(.XLEN(32)) u_add_dot (.A(dot_prod),.B(dot_prod_o),.result(dot_prod_accum));
 
     // Adder for magnitude A accumulation
-    adder u_add_mag_a (.a(mag_a),.b(mag_a_o),.out(mag_a_accum));
+    FloatingAddition #(.XLEN(32)) u_add_mag_a (.A(mag_a),.B(mag_a_o),.result(mag_a_accum));
 
     // Adder for magnitude B accumulation
-    adder u_add_mag_b (.a(mag_b),.b(mag_b_o),.out(mag_b_accum));
+    FloatingAddition #(.XLEN(32)) u_add_mag_b (.A(mag_b),.B(mag_b_o),.result(mag_b_accum));
 
     // Square root for magnitude A
-    sqrt u_sqrt_a (.in(mag_a_accum),.out(mag_a_sqrt_o));
+    FloatingSqrt #(.XLEN(32)) u_sqrt_a (.A(mag_a_accum),.result(mag_a_sqrt_o), .clk(), .overflow(), .underflow(), .exception());
 
     // Square root for magnitude B
-    sqrt u_sqrt_b (.in(mag_b_accum),.out(mag_b_sqrt_o));
+    FloatingSqrt #(.XLEN(32)) u_sqrt_b (.A(mag_b_accum),.result(mag_b_sqrt_o), .clk(), .overflow(), .underflow(), .exception());
 
     // Multiplier for denominator (sqrtA * sqrtB)
-    multiplier u_mult_den (.a(mag_a_sqrt),.b(mag_b_sqrt),.out(den_o));
+    FloatingMultiplication #(.XLEN(32)) u_mult_den (.A(mag_a_sqrt),.B(mag_b_sqrt),.result(den_o), .clk(clk));
 
     // Divider for final similarity
-    divider u_div (.num(dot_prod),.den(den_o),.out(div_o));
+    FloatingDivision #(.XLEN(32)) u_div (.A(dot_prod),.B(den_o),.result(div_o), .zero_division(), .clk(clk));
 
 
     /******************************* FSM ********************************************/
@@ -172,7 +172,7 @@
 		end
 		MAG_B : begin
 		       	next_state = (index == W-1)? SQRT : MAG_B;
-			if (next_state == ) index = 0;
+			if (next_state == SQRT) index = 0;
 		end
 		SQRT : begin 
 			next_state = DIV;

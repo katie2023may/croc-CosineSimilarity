@@ -1,4 +1,5 @@
 floatingAddition.v
+floatingCompare.v
 floatingDivision.v
 floatingMult.v
 floatingSqrt.v
