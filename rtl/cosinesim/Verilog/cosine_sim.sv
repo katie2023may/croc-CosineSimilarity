@@ -7,7 +7,7 @@
     ) (
         input logic clk,                        // Clock signal
         input logic rst_n,                      // Asynchronous, active low reset
-        input loigc start,                      // Start signal to trigger computation
+        input logic start,                      // Start signal to trigger computation
         input logic [31:0] vec_a [W-1:0],       // Input Vector A
         input logic [31:0] vec_b [W-1:0],       // Input Vector B
         output logic [31:0] similarity,         // Output cosine similarity result
@@ -22,8 +22,10 @@
     // TODO: Add additional reg/wire if needed
     
     //Internal reg. for intermediate calc. INPUT/OUTPUT
-    logic [31:0] add_o;
     logic [31:0] dot_prod_accum;
+    logic [31:0] div_o;
+    logic [31:0] den_o;
+    logic [31:0] mag_a_accum, mag_b_accum;
     logic [31:0] dot_prod_o;
     logic [31:0] mag_a, mag_b;
     logic [31:0] mag_a_sqrt, mag_b_sqrt; 
@@ -89,6 +91,16 @@
             index <= 3'd0;
             // Output signals
             similarity <= 32'd0;
+	    dot_prod_accum <= 32'd0;
+	    mag_a_accum <= 32'd0;
+	    mag_b_accum <= 32'd0;
+	    dot_prod_o <= 32'd0;
+	    mag_a_o <= 32'd0;
+	    mag_b_o <= 32'd0;
+	    mag_a_sqrt_o <= 32'd0;
+	    mag_b_sqrt_o <= 32'd0;
+	    div_o <= 32'd0;
+	    den_o <= 32'd0;
             valid <= 1'b0;
         end 
         
@@ -99,7 +111,7 @@
             // TODO: Write the seq. logic for each state for each computation step (dot, mag, sqrt, div)
             case (state)
 		IDLE : begin 
-		       	index <= 3'd0;   // Reset index
+		       index <= 3'd0;   // Reset index
 			dot_prod <= 32'd0;
 			mag_a <= 32'd0;
 			mag_b <= 32'd0;
@@ -131,7 +143,7 @@
 
                 DIV : begin
                     // TODO: Update the I/O of the div module and incr. index
-                    similarity <= div_result;                // Output update
+                    similarity <= div_o;                // Output update
                 end
 
                 DONE : valid <= 1'b1;   // Assert valid --> Compuation = DONE
