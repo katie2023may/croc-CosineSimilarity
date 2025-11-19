@@ -23,6 +23,7 @@
     
     //Internal reg. for intermediate calc. INPUT/OUTPUT
     logic [31:0] dot_prod_accum;
+    logic [31:0] dot_prod;
     logic [31:0] div_o;
     logic [31:0] den_o;
     logic [31:0] mag_a_accum, mag_b_accum;
@@ -92,15 +93,15 @@
             // Output signals
             similarity <= 32'd0;
 	    dot_prod_accum <= 32'd0;
-	    mag_a_accum <= 32'd0;
-	    mag_b_accum <= 32'd0;
-	    dot_prod_o <= 32'd0;
-	    mag_a_o <= 32'd0;
-	    mag_b_o <= 32'd0;
-	    mag_a_sqrt_o <= 32'd0;
-	    mag_b_sqrt_o <= 32'd0;
-	    div_o <= 32'd0;
-	    den_o <= 32'd0;
+//	    mag_a_accum <= 32'd0;
+//	    mag_b_accum <= 32'd0;
+//	    dot_prod_o <= 32'd0;
+//	    mag_a_o <= 32'd0;
+//	    mag_b_o <= 32'd0;
+//	    mag_a_sqrt_o <= 32'd0;
+//	    mag_b_sqrt_o <= 32'd0;
+//	    div_o <= 32'd0;
+//	    den_o <= 32'd0;
             valid <= 1'b0;
         end 
         
@@ -128,7 +129,7 @@
 		    index <= index + 1;
 	        end
 
-                MAB_B : begin
+                MAG_B : begin
                     // TODO: Update the I/O of vecB_Mag module and incr. index
                     mag_b <= mag_b_accum;
 		    index <= index + 1;
