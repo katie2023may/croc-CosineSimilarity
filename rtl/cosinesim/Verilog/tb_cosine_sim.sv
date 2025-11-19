@@ -48,7 +48,7 @@ module tb_cosine_sim;
    real b0, b1, b2, b3, b4;
    
     // clk generation
-    localparam int CLK_PERIOD = 10;     // TODO: TBD
+    localparam int CLK_PERIOD = 1_000_000_;     // TODO: TBD
     initial begin
         clk = 1'b0;
         forever #(CLK_PERIOD/2) clk = ~clk;
@@ -116,6 +116,8 @@ module tb_cosine_sim;
       wait (valid == 1'b1);
       #CLK_PERIOD;
       computed_sim = fixed_to_real(similarity);
+
+      $display("\n Similarity in BIT: %b \n", similarity);
 
       if (computed_sim == expected_sim) begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);

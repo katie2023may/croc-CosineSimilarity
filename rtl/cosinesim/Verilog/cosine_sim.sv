@@ -162,7 +162,7 @@
                     // TODO: Update the I/O of the sqrt module and incr. index
                     mag_a_sqrt <= mag_a_sqrt_o;
 		    mag_b_sqrt <= mag_b_sqrt_o;
-	            index = index + 3'd1; 
+	            index <= index + 3'd1; 
 	        end
 
                 DIV : begin
@@ -177,6 +177,10 @@
                     valid <= 1'b0;
                 end
             endcase
+
+//	    $display("\n \n Current state: %d", state);
+//	    $display("Next state: %d", next_state);
+//	    $display("start: %b \n \n", start);
         end
     end
 
@@ -210,7 +214,11 @@
 			next_state = IDLE;
 		end
             default : next_state = IDLE;
+	    
         endcase
+//	$display("\n \nCurrent state: %d", state);
+//	$display("Next state: %d", next_state);
+//	$display("start: %b\n \n", start);
     end
 
 endmodule
