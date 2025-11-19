@@ -24,7 +24,7 @@ module tb_cosine_sim;
     logic start;
     logic [31:0] vec_a [W-1:0];
     logic [31:0] vec_b [W-1:0];
-    logic [31:0] sim;
+    logic [31:0] similarity;
     logic valid;
 
     cosine_sim #(.W(W)) dut (
@@ -33,7 +33,7 @@ module tb_cosine_sim;
         .start(start),
         .vec_a(vec_a),
         .vec_b(vec_b),
-        .sim(sim),
+        .similarity(similarity),
         .valid(valid)
     );
 
@@ -115,7 +115,7 @@ module tb_cosine_sim;
 
       wait (valid == 1'b1);
       #CLK_PERIOD;
-      computed_sim = $bitstoreal(sim);
+      computed_sim = $fixed_to_real(similarity);
 
       if (computed_sim == expected_sim) begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);
