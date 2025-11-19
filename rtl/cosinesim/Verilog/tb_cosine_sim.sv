@@ -86,11 +86,11 @@ module tb_cosine_sim;
       // TODO: manually compute expected simiarity
       expected_sim = 1.0;
 
-      vec_a[0] = $realtobits(a1);
-      vec_a[1] = $realtobits(a2);
-      vec_a[2] = $realtobits(a3);
-      vec_a[3] = $realtobits(a4);
-      vec_a[4] = $realtobits(a5);
+      vec_a[0] = $realtobits(a0);
+      vec_a[1] = $realtobits(a1);
+      vec_a[2] = $realtobits(a2);
+      vec_a[3] = $realtobits(a3);
+      vec_a[4] = $realtobits(a4);
 
       vec_b[0] = $realtobits(b0);
       vec_b[1] = $realtobits(b1);

@@ -68,7 +68,7 @@
 
     /******************************* FSM ********************************************/
     // FSM state definitions
-    typedef enum logic [2:0] {
+/*    typedef enum logic [2:0] {
         IDLE,
         DOT,
         MAG_A,
@@ -77,8 +77,19 @@
         DIV,
         DONE
     } state_t;
+*/
 
-    state_t state, next_state;          // State reg.
+//    state_t state, next_state;          // State reg.
+
+    localparam IDLE = 3'd0;
+    localparam DOT = 3'd1;
+    localparam MAG_A = 3'd2;
+    localparam MAG_B = 3'd3;
+    localparam SQRT = 3'd4;
+    localparam DIV = 3'd5;
+    localparam DONE = 3'd6;
+
+    logic [2:0] state, next_state;
 
     // FSM: Sequential state trans. and output logic
     always_ff @ (posedge clk or negedge rst_n) begin
@@ -120,26 +131,38 @@
                 DOT : begin
                     // TODO: Update the I/O of dot_prod modueland increment index
 		    dot_prod <= dot_prod_accum;
-		    index <= index + 1;
+		    if (index == W-1) begin
+			index <= 3'd0;
+		    end else begin
+		    	index <= index + 1;
+	    	    end
                 end
 
                 MAG_A : begin
                     // TODO: Update the I/O of vecA_Mag module and increment index
-                    mag_a <= mag_a_accum;
-		    index <= index + 1;
+		    mag_a <= mag_a_accum;
+		    if (index == W-1) begin
+           		index <= 3'd0;
+		    end else begin
+		    	index <= index + 3'd1;
+	            end
 	        end
 
                 MAG_B : begin
                     // TODO: Update the I/O of vecB_Mag module and incr. index
                     mag_b <= mag_b_accum;
-		    index <= index + 1;
-	       end
+		    if (index == W-1) begin
+			index <= 3'd0;	    
+		    end else begin
+			index <= index + 3'd1;
+		    end
+	        end
 
                 SQRT : begin
                     // TODO: Update the I/O of the sqrt module and incr. index
                     mag_a_sqrt <= mag_a_sqrt_o;
 		    mag_b_sqrt <= mag_b_sqrt_o;
-	            index = index + 1; 
+	            index = index + 3'd1; 
 	        end
 
                 DIV : begin
@@ -159,21 +182,23 @@
 
     // FSM: Comb. logic for next state
     always_comb begin
-        case (state)
-		IDLE : begin
+//        next_state = IDLE;
+	    case (state)
+		
+    		IDLE : begin
 			next_state = (start == 1'b1)? DOT : IDLE;
 		end
 		DOT : begin
 		        next_state = (index == W-1)? MAG_A : DOT;
-			if (next_state == MAG_A) index = 0;
+//			if (next_state == MAG_A) index = 0;
 		end
 		MAG_A : begin
 		       	next_state = (index == W-1)? MAG_B : MAG_A;
-			if (next_state == MAG_B) index = 0;
+//			if (next_state == MAG_B) index = 0;
 		end
 		MAG_B : begin
 		       	next_state = (index == W-1)? SQRT : MAG_B;
-			if (next_state == SQRT) index = 0;
+//			if (next_state == SQRT) index = 0;
 		end
 		SQRT : begin 
 			next_state = DIV;
