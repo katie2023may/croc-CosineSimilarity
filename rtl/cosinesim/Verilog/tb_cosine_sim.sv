@@ -15,6 +15,8 @@ TB strategy:
 
 module tb_cosine_sim;
 
+   localparam FRAC = 15;
+
     // DUT
     localparam W = 5;
     logic clk;
@@ -22,16 +24,16 @@ module tb_cosine_sim;
     logic start;
     logic [31:0] vec_a [W-1:0];
     logic [31:0] vec_b [W-1:0];
-    logic [31:0] similarity;
+    logic [31:0] sim;
     logic valid;
 
-    cosine_sim #(.W(W)) dut (
+    cosine_sim dut #(.W(W)) (
         .clk(clk),
         .rst_n(rst_n),
         .start(start),
         .vec_a(vec_a),
         .vec_b(vec_b),
-        .similarity(similarity),
+        .sim(sim),
         .valid(valid)
     );
 
@@ -66,6 +68,14 @@ module tb_cosine_sim;
       // $display("Fixed-point format: <int,%0d>", FRAC);
       $display("========================================\n");
 
+      function real fixed_to_real(logic signed [31:0] fixed_val);
+         return $itor(fixed_val) / (2.0 ** FRAC);
+      endfunction
+
+      function logic signed [31:0] real_to_fixed(real real_val);
+         return $rtoi(real_val * (2.0 ** FRAC));
+      endfunction
+
    /**************************************** ITERATION 1 *************************************/
       #(CLK_PERIOD * 2);
       rst_n = 1'b1;
@@ -86,17 +96,17 @@ module tb_cosine_sim;
       // TODO: manually compute expected simiarity
       expected_sim = 1.0;
 
-      vec_a[0] = $realtobits(a0);
-      vec_a[1] = $realtobits(a1);
-      vec_a[2] = $realtobits(a2);
-      vec_a[3] = $realtobits(a3);
-      vec_a[4] = $realtobits(a4);
+      vec_a[0] = real_to_fixed(a0);
+      vec_a[1] = real_to_fixed(a1);
+      vec_a[2] = real_to_fixed(a2);
+      vec_a[3] = real_to_fixed(a3);
+      vec_a[4] = real_to_fixed(a4);
 
-      vec_b[0] = $realtobits(b0);
-      vec_b[1] = $realtobits(b1);
-      vec_b[2] = $realtobits(b2);
-      vec_b[3] = $realtobits(b3);
-      vec_b[4] = $realtobits(b4);
+      vec_b[0] = real_to_fixed(a0);
+      vec_b[1] = real_to_fixed(a1);
+      vec_b[2] = real_to_fixed(a2);
+      vec_b[3] = real_to_fixed(a3);
+      vec_b[4] = real_to_fixed(a4);
 
       // trigger computation
       start = 1'b1;
@@ -105,16 +115,16 @@ module tb_cosine_sim;
 
       wait (valid == 1'b1);
       #CLK_PERIOD;
-      computed_sim = $bitstoreal(similarity);
+      computed_sim = $bitstoreal(sim);
 
       if (computed_sim == expected_sim) begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);
          $display("Vector B = [%f, %f, %f, %f, %f]", b0, b1, b2, b3, b4);
-         $display("PASSED: Computed = %f - Expected = %f\n", computed_sim, expected_sim);
+         $display("PASSED: Computed = %f - Expected = %f", computed_sim, expected_sim);
       end else begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);
          $display("Vector B = [%f, %f, %f, %f, %f]", b0, b1, b2, b3, b4);
-         $display("FAILED: Computed = %f - Expected = %f\n", computed_sim, expected_sim);
+         $display("FAILED: Computed = %f - Expected = %f", computed_sim, expected_sim);
       end
       /************************* END OF ITERATION 1 **********************************/
 
