@@ -22,9 +22,14 @@ module tb_cosine_sim;
     logic clk;
     logic rst_n;
     logic start;
-    logic [31:0] vec_a [W-1:0];
-    logic [31:0] vec_b [W-1:0];
+    logic signed [31:0] vec_a [W-1:0];
+    logic signed [31:0] vec_b [W-1:0];
     logic signed [31:0] similarity;
+    logic [2:0] index;
+    logic [2:0] state;
+    logic [31:0] dot_prod;
+    logic [31:0] dot_prod_accum;
+    logic [31:0] dot_prod_o;
     logic valid;
 
     cosine_sim #(.W(W)) dut (
@@ -34,6 +39,11 @@ module tb_cosine_sim;
         .vec_a(vec_a),
         .vec_b(vec_b),
         .similarity(similarity),
+	.index(index),
+	.state(state),
+	.dot_prod(dot_prod),
+	.dot_prod_accum(dot_prod_accum),
+	.dot_prod_o(dot_prod_o),
         .valid(valid)
     );
 
@@ -96,24 +106,49 @@ module tb_cosine_sim;
       // TODO: manually compute expected simiarity
       expected_sim = 1.0;
 
-      vec_a[0] = real_to_fixed(a0);
-      vec_a[1] = real_to_fixed(a1);
-      vec_a[2] = real_to_fixed(a2);
-      vec_a[3] = real_to_fixed(a3);
-      vec_a[4] = real_to_fixed(a4);
+      //vec_a[0] = 32'($realtobits(a0));
+      //vec_a[1] = $realtobits(a1);
+      //vec_a[2] = $realtobits(a2);
+      //vec_a[3] = $realtobits(a3);
+      //vec_a[4] = $realtobits(a4);
 
-      vec_b[0] = real_to_fixed(a0);
-      vec_b[1] = real_to_fixed(a1);
-      vec_b[2] = real_to_fixed(a2);
-      vec_b[3] = real_to_fixed(a3);
-      vec_b[4] = real_to_fixed(a4);
+      //vec_b[0] = 32'($realtobits(a0));
+      //vec_b[1] = $realtobits(a1);
+      //vec_b[2] = $realtobits(a2);
+      //vec_b[3] = $realtobits(a3);
+      //vec_b[4] = $realtobits(a4);
+
+      vec_a[0] = 32'h3F800000;
+      vec_a[1] = 32'h3F800000;
+      vec_a[2] = 32'h3F800000;
+      vec_a[3] = 32'h3F800000;
+      vec_a[4] = 32'h3F800000;
+
+      vec_b[0] = 32'h3F800000;
+      vec_b[1] = 32'h3F800000;
+      vec_b[2] = 32'h3F800000;
+      vec_b[3] = 32'h3F800000;
+      vec_b[4] = 32'h3F800000;
 
       // trigger computation
       start = 1'b1;
       @ (posedge clk)
       start = 1'b0;
+      
+      $display("\n Index: %b \n", index);
+      $display("\n State: %b \n", state);
 
-      wait (valid == 1'b1);
+
+      while (valid != 1'b1) begin
+	  @(posedge clk);
+         $display("Index: %b", index);
+         $display("State: %b", state);
+	 $display("Dot_prod: %b", dot_prod);
+	 $display("Dot_prod_accum: %b", dot_prod_accum);
+	 $display("dot_prod_o: %b", dot_prod_o);
+	 $display("vec_a[index]: %h", vec_a[index]);
+	 $display("vec_b[index]: %h", vec_b[index]);
+	end
       #CLK_PERIOD;
       computed_sim = fixed_to_real(similarity);
 

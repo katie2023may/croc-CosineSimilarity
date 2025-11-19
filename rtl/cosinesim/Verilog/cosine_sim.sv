@@ -8,13 +8,18 @@
         input logic clk,                        // Clock signal
         input logic rst_n,                      // Asynchronous, active low reset
         input logic start,                      // Start signal to trigger computation
-        input logic [31:0] vec_a [W-1:0],       // Input Vector A
-        input logic [31:0] vec_b [W-1:0],       // Input Vector B
+        input logic signed [31:0] vec_a [W-1:0],       // Input Vector A
+        input logic signed [31:0] vec_b [W-1:0],       // Input Vector B
         output logic signed [31:0] similarity,         // Output cosine similarity result
+	output logic [2:0] index,
+	output logic [2:0] state,
+	output logic [31:0] dot_prod_accum,
+	output logic [31:0] dot_prod,
+	output logic [31:0] dot_prod_o,
         output logic valid                      // Output valid signal
     );
 
-    logic [2:0] index;          // Index to access vector elements
+    //logic [2:0] index;          // Index to access vector elements
 
     /******************** Instantiating COMPUTING modules *******************************/
     // TODO: Big idea --> Update sub-module inputs sequentially - Compute sub-module outputs combinationally - Update top-level outputs sequentially
@@ -22,12 +27,12 @@
     // TODO: Add additional reg/wire if needed
     
     //Internal reg. for intermediate calc. INPUT/OUTPUT
-    logic [31:0] dot_prod_accum;
-    logic [31:0] dot_prod;
+   // logic [31:0] dot_prod_accum;
+   // logic [31:0] dot_prod;
     logic [31:0] div_o;
     logic [31:0] den_o;
     logic [31:0] mag_a_accum, mag_b_accum;
-    logic [31:0] dot_prod_o;
+    //logic [31:0] dot_prod_o;
     logic [31:0] mag_a, mag_b;
     logic [31:0] mag_a_sqrt, mag_b_sqrt; 
     logic [31:0] mag_a_o, mag_b_o;
@@ -89,7 +94,7 @@
     localparam DIV = 3'd5;
     localparam DONE = 3'd6;
 
-    logic [2:0] state, next_state;
+    logic [2:0]  next_state;
 
     // FSM: Sequential state trans. and output logic
     always_ff @ (posedge clk or negedge rst_n) begin
@@ -123,7 +128,7 @@
             // TODO: Write the seq. logic for each state for each computation step (dot, mag, sqrt, div)
             case (state)
 		IDLE : begin 
-		       index <= 3'd0;   // Reset index
+		        index <= 3'd0;   // Reset index
 			dot_prod <= 32'd0;
 			mag_a <= 32'd0;
 			mag_b <= 32'd0;
