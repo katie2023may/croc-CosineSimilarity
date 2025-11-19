@@ -103,7 +103,7 @@
             index <= 3'd0;
             // Output signals
             similarity <= 32'd0;
-	    dot_prod_accum <= 32'd0;
+//	    dot_prod_accum <= 32'd0;
 //	    mag_a_accum <= 32'd0;
 //	    mag_b_accum <= 32'd0;
 //	    dot_prod_o <= 32'd0;

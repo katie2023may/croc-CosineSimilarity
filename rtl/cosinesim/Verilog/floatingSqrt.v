@@ -25,20 +25,20 @@ assign Mantissa = A[22:0];
 /*----First Iteration----*/
 FloatingDivision D1(.A({1'b0,8'd126,Mantissa}),.B(x0),.result(temp1));
 FloatingAddition A1(.A(temp1),.B(x0),.result(temp2));
-assign x1 = {temp2[31],temp2[30:23]-1,temp2[22:0]};
+assign x1 = {temp2[31],temp2[30:23] - 8'd1,temp2[22:0]};
 /*----Second Iteration----*/
 FloatingDivision D2(.A({1'b0,8'd126,Mantissa}),.B(x1),.result(temp3));
 FloatingAddition A2(.A(temp3),.B(x1),.result(temp4));
-assign x2 = {temp4[31],temp4[30:23]-1,temp4[22:0]};
+assign x2 = {temp4[31],temp4[30:23] - 8'd1,temp4[22:0]};
 /*----Third Iteration----*/
 FloatingDivision D3(.A({1'b0,8'd126,Mantissa}),.B(x2),.result(temp5));
 FloatingAddition A3(.A(temp5),.B(x2),.result(temp6));
-assign x3 = {temp6[31],temp6[30:23]-1,temp6[22:0]};
+assign x3 = {temp6[31],temp6[30:23] - 8'd1,temp6[22:0]};
 FloatingMultiplication M1(.A(x3),.B(sqrt_1by05),.result(temp7));
 
 assign pos = (Exponent>=8'd127) ? 1'b1 : 1'b0;
-assign Exp_2 = pos ? (Exponent-8'd127)/2 : (Exponent-8'd127-1)/2 ;
-assign remainder = (Exponent-8'd127)%2;
+assign Exp_2 = pos ? (Exponent - 8'd127)/2 : (Exponent - 8'd127 - 8'd1)/2 ;
+assign remainder = (Exponent - 8'd127)%2;
 assign temp = {temp7[31],Exp_2 + temp7[30:23],temp7[22:0]};
 //assign temp7[30:23] = Exp_2 + temp7[30:23];
 FloatingMultiplication M2(.A(temp),.B(sqrt_2),.result(temp8));
