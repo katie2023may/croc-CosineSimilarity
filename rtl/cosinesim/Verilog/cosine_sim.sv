@@ -10,7 +10,7 @@
         input logic start,                      // Start signal to trigger computation
         input logic [31:0] vec_a [W-1:0],       // Input Vector A
         input logic [31:0] vec_b [W-1:0],       // Input Vector B
-        output logic [31:0] similarity,         // Output cosine similarity result
+        output logic signed [31:0] similarity,         // Output cosine similarity result
         output logic valid                      // Output valid signal
     );
 

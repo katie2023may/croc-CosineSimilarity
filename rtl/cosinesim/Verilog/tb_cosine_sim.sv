@@ -24,7 +24,7 @@ module tb_cosine_sim;
     logic start;
     logic [31:0] vec_a [W-1:0];
     logic [31:0] vec_b [W-1:0];
-    logic [31:0] similarity;
+    logic signed [31:0] similarity;
     logic valid;
 
     cosine_sim #(.W(W)) dut (
@@ -115,19 +115,21 @@ module tb_cosine_sim;
 
       wait (valid == 1'b1);
       #CLK_PERIOD;
-      computed_sim = $fixed_to_real(similarity);
+      computed_sim = fixed_to_real(similarity);
 
       if (computed_sim == expected_sim) begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);
          $display("Vector B = [%f, %f, %f, %f, %f]", b0, b1, b2, b3, b4);
-         $display("PASSED: Computed = %f - Expected = %f", computed_sim, expected_sim);
+         $display("PASSED: Computed = %f - Expected = %f\n", computed_sim, expected_sim);
       end else begin
          $display("\nVector A = [%f, %f, %f, %f, %f]", a0, a1, a2, a3, a4);
          $display("Vector B = [%f, %f, %f, %f, %f]", b0, b1, b2, b3, b4);
-         $display("FAILED: Computed = %f - Expected = %f", computed_sim, expected_sim);
+         $display("FAILED: Computed = %f - Expected = %f\n", computed_sim, expected_sim);
       end
       /************************* END OF ITERATION 1 **********************************/
-
+	
+      #CLK_PERIOD;
+      $finish;
    end
 
    initial begin
