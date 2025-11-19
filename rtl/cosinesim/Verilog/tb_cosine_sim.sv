@@ -27,7 +27,7 @@ module tb_cosine_sim;
     logic [31:0] sim;
     logic valid;
 
-    cosine_sim dut #(.W(W)) (
+    cosine_sim #(.W(W)) dut (
         .clk(clk),
         .rst_n(rst_n),
         .start(start),
@@ -54,6 +54,14 @@ module tb_cosine_sim;
         forever #(CLK_PERIOD/2) clk = ~clk;
     end
 
+   function real fixed_to_real(logic signed [31:0] fixed_val);
+      return $itor(fixed_val) / (2.0 ** FRAC);
+   endfunction
+
+   function logic signed [31:0] real_to_fixed(real real_val);
+      return $rtoi(real_val * (2.0 ** FRAC));
+   endfunction
+
    initial begin
       rst_n = 1'b0;                    // Reset all signals
       start = 1'b0;
@@ -67,14 +75,6 @@ module tb_cosine_sim;
       $display("Clock Period: %0d ns", CLK_PERIOD);
       // $display("Fixed-point format: <int,%0d>", FRAC);
       $display("========================================\n");
-
-      function real fixed_to_real(logic signed [31:0] fixed_val);
-         return $itor(fixed_val) / (2.0 ** FRAC);
-      endfunction
-
-      function logic signed [31:0] real_to_fixed(real real_val);
-         return $rtoi(real_val * (2.0 ** FRAC));
-      endfunction
 
    /**************************************** ITERATION 1 *************************************/
       #(CLK_PERIOD * 2);
