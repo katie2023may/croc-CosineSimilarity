@@ -28,7 +28,7 @@ module datapath(
 );
 
     /***** Next PC Logic *****/
-    logic [W-1:0] pc_next;
+    logic [3:0] pc_next;
 
     // PC --> Next PC 
     pc_en #(4) pc (
