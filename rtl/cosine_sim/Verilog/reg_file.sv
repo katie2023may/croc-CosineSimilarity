@@ -16,7 +16,8 @@ module reg_file (
     input logic [2:0] dest_reg,                 // Addr. of dest. reg
     output logic [31:0] src_1_data, src_2_data  // Data read from src_1_addr and src_2_addr
 );
-    localparam REG_NUM = 12;                     // # of needed reg
+    localparam REG_NUM = 12;                     // # of needed reg --- APPROACH 1
+    // localparam REG_NUM = 20;                     // # of needed reg --- APPROACH 2  
 
     // Need 6 registers to store intermediate values --- Mem-mapped Regs
     logic [31:0] mem [REG_NUM - 1:0];             // 6 32-bit wide registers
