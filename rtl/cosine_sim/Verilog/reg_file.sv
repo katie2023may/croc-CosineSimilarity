@@ -2,6 +2,8 @@
 
 This is the Reg file for the microgram to store intermediate values
 
+Total needed register:
+
 */
 
 
@@ -14,7 +16,7 @@ module reg_file (
     input logic [2:0] dest_reg,                 // Addr. of dest. reg
     output logic [31:0] src_1_data, src_2_data  // Data read from src_1_addr and src_2_addr
 );
-    localparam REG_NUM = 6;                     // # of needed reg
+    localparam REG_NUM = 12;                     // # of needed reg
 
     // Need 6 registers to store intermediate values --- Mem-mapped Regs
     logic [31:0] mem [REG_NUM - 1:0];             // 6 32-bit wide registers
@@ -35,7 +37,10 @@ module reg_file (
             mem[i] = 32'd0;
         end
 
-        // Init other reg 
+        // Init other reg
+        mem[10] = 32'd0;        // Constant 0
+        mem[11] = 32'd1;        // Constant 1
+        mem[12] = 32'd4;        // Vector length - 1 = max index
     end
 
 endmodule
