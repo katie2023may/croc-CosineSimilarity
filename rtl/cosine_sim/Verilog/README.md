@@ -11,6 +11,7 @@
     + CoSim reads the values from the two input vectors (index by index), then write back the 32-bit cosne similarity result
 
 2) FULL UPROGRAM INSTRUCTION FLOW 
+### APPROACH 1 ###
 ### Phase 1 ###: Compute Numerator and Denominator
 # Phase 1a: Numerator
 load a_i            
@@ -37,7 +38,24 @@ div numerator, denominator --> result
 
 ### THIS IMPLEMENTATION REQUIRES EXTRA CONTROL SIGNAL ###
 
+#####################################################################################
+### OTHER APPROACH ###
+Load all of the input vector entries (5 for vec_a & 5 for vec_b = 10)
+load a_0
+load b_0
+load a_1
+load b_1
+load a_2
+load b_2
+load a_3
+load b_3
+load a_4
+load b_4
+
+TBD
+
 3) REGISTER FILE STRUCTURE
+### APPROACH 1 ###
 ### Address : Value ###
 0x0 : a_i
 0x1 : b_i
@@ -51,6 +69,28 @@ div numerator, denominator --> result
 0x9 : 0x0
 0xA : 0x1
 0xB : 0x4
+
+### APPROACH 2 ###
+0x0 : a_0
+0x1 : b_0
+0x2 : a_1
+0x3 : b_1
+0x4 : a_2
+0x5 : b_2
+0x6 : a_3
+0x7 : b_3
+0x8 : a_4
+0x9 : b_4
+0xA : mul_result
+0xB : numerator
+0xC : denominator
+0xD : acc_a
+0xE : acc_b
+0xF : result
+0x10 : index
+0x11: 0x0
+0x12: 0x1
+0x13: 0x4
 
 4) Memory-mapped Registers
 
