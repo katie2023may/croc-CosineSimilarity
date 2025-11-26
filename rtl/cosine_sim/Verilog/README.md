@@ -1,4 +1,4 @@
-### DOCUMENTATION for Cosine Similarity ALgorithm Implementation in System Verilog ###
+### DOCUMENTATION for Cosine Similarity Algorithm Implementation in System Verilog ###
 
 1) OVERVIEW: SINGLE-CYCLE ARCHITECTURE
 - Instruction format:
