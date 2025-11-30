@@ -22,8 +22,8 @@ int main(void) {
     int stop = 0;
     //uint32_t start, end;
     cosine[2] = 0;    
-    cosine[0] = 0x04030201;
-    cosine[1] = 0x04030201;  // example angle
+    cosine[0] = 0x0C1f071f;
+    cosine[1] = 0x01090203;  // example angle
     cosine[2] = 1;
     cosine[2] = 0;
    // start = get_mcycle(); 
@@ -32,7 +32,7 @@ int main(void) {
 	counter++;
     }
     int result = cosine[3];   // read
-    printf("Cosine Similarity Calculation Result -> %x\n", result);
+    printf("\nCosine Similarity Calculation Result -> %x\n", result);
     uart_write_flush();
     return 1;
 }
