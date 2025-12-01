@@ -5,7 +5,9 @@
 // Authors:
 // - Philippe Sauter <phsauter@iis.ee.ethz.ch>
 
-module user_domain import user_pkg::*; import croc_pkg::*; #(
+module user_domain 
+	import user_pkg::*; 
+	   import croc_pkg::*; #(
   parameter int unsigned GpioCount = 16
 ) (
   input  logic      clk_i,
@@ -50,9 +52,17 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
   sbr_obi_req_t user_error_obi_req;
   sbr_obi_rsp_t user_error_obi_rsp;
 
+   // CosineHW Subordinate Bus
+   sbr_obi_req_t user_cosinehw_obi_req;
+   sbr_obi_rsp_t user_cosinehw_obi_rsp;
+
+
   // Fanout into more readable signals
   assign user_error_obi_req              = all_user_sbr_obi_req[UserError];
   assign all_user_sbr_obi_rsp[UserError] = user_error_obi_rsp;
+  
+  assign user_cosinehw_obi_req              = all_user_sbr_obi_req[UserCosinehw];
+  assign all_user_sbr_obi_rsp[UserCosinehw] = user_cosinehw_obi_rsp;
 
 
   //-----------------------------------------------------------------------------------------------
@@ -68,14 +78,14 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
     .rule_t    ( addr_map_rule_t                ),
     .Napot     ( 1'b0                           )
   ) i_addr_decode_periphs (
-    .addr_i           ( user_sbr_obi_req_i.a.addr ),
-    .addr_map_i       ( user_addr_map             ),
-    .idx_o            ( user_idx                  ),
-    .dec_valid_o      (),
-    .dec_error_o      (),
-    .en_default_idx_i ( 1'b1 ),
-    .default_idx_i    ( '0   )
-  );
+    			.addr_i           ( user_sbr_obi_req_i.a.addr ),
+    			.addr_map_i       ( user_addr_map             ),
+    			.idx_o            ( user_idx                  ),
+    			.dec_valid_o      (),
+    			.dec_error_o      (),
+    			.en_default_idx_i ( 1'b1 ),
+    			.default_idx_i    ( '0   )
+  			);
 
   obi_demux #(
     .ObiCfg      ( SbrObiCfg     ),
@@ -84,21 +94,37 @@ module user_domain import user_pkg::*; import croc_pkg::*; #(
     .NumMgrPorts ( NumDemuxSbr   ),
     .NumMaxTrans ( 2             )
   ) i_obi_demux (
-    .clk_i,
-    .rst_ni,
+    		.clk_i,
+    		.rst_ni,
 
-    .sbr_port_select_i ( user_idx             ),
-    .sbr_port_req_i    ( user_sbr_obi_req_i   ),
-    .sbr_port_rsp_o    ( user_sbr_obi_rsp_o   ),
+    		.sbr_port_select_i ( user_idx             ),
+    		.sbr_port_req_i    ( user_sbr_obi_req_i   ),
+    		.sbr_port_rsp_o    ( user_sbr_obi_rsp_o   ),
 
-    .mgr_ports_req_o   ( all_user_sbr_obi_req ),
-    .mgr_ports_rsp_i   ( all_user_sbr_obi_rsp )
+    		.mgr_ports_req_o   ( all_user_sbr_obi_req ),
+    		.mgr_ports_rsp_i   ( all_user_sbr_obi_rsp )
   );
 
 
 //-------------------------------------------------------------------------------------------------
 // User Subordinates
 //-------------------------------------------------------------------------------------------------
+
+
+   // Cosinehw Subordinate
+   cosinehw #(
+           .ObiCfg    ( SbrObiCfg     ),
+           .obi_req_t ( sbr_obi_req_t ),
+           .obi_rsp_t ( sbr_obi_rsp_t )
+           ) i_cosinehw (
+                     .clk_i,
+                     .rst_ni,
+
+                     .obi_req_i ( user_cosinehw_obi_req ),
+                     .obi_rsp_o ( user_cosinehw_obi_rsp )
+                     );
+
+
 
   // Error Subordinate
   obi_err_sbr #(
