@@ -278,12 +278,9 @@ endfunction
 
 
 function automatic logic [15:0] sqrt (input logic [15:0] square);
-
-    if      (square > 16383) sqrt = 128;
-    else if (square > 8191)  sqrt = 90;
-
-    else if (square >  4095) sqrt =  64;
-/*    else if (square >  3968) sqrt =  63;
+//max input square is 3844
+    if (square >  4095) sqrt =  64;
+    else if (square >  3968) sqrt =  63;
     else if (square >  3843) sqrt =  62;
     else if (square >  3720) sqrt =  61;
     else if (square >  3599) sqrt =  60;
@@ -313,7 +310,7 @@ function automatic logic [15:0] sqrt (input logic [15:0] square);
     else if (square > 1295) sqrt =  36;
     else if (square > 1224) sqrt =  35;
     else if (square > 1155) sqrt =  34;
- */   else if (square > 1088) sqrt =  33;
+    else if (square > 1088) sqrt =  33;
     else if (square > 1023) sqrt =  32;
 
     else if (square > 960)   sqrt = 31;
