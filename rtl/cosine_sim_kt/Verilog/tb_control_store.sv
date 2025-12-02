@@ -105,7 +105,7 @@ module tb_control_store;
             $display("OpB: %0d", dut.opB);
 
 
-	    $display("cosine_similarity: %0d", dut.cosine_similarity);
+	    $display("cosine_similarity: %0f", dut.cosine_similarity);
 
 
         end
