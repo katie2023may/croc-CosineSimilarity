@@ -25,12 +25,12 @@ module tb_control_store;
 
     // Simulation control
     initial begin
-
+	start = 0;
 	
         // Initialize
-        reset = 1;
-        #100;                  // keep reset high for two clock cycles
         reset = 0;
+        #100;                  // keep reset high for two clock cycles
+        reset = 1;
       
         $display("=== Starting Control Store Test ===");
         A_vec = 32'h04030201;
