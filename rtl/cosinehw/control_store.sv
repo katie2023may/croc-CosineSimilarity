@@ -259,20 +259,24 @@ div_4_8 = divisor << 2;
 div_5_8 = (div_4_8 + div_1_8);
 div_6_8 = div_4_8 + div_2_8;
 div_7_8 = div_6_8 + div_1_8;
-//$display ("div_2_8: %0d, div_3_8: %0d, div_4_8: %0d, div_5_8: %0d, div_6_8: %0d, div_7_8: %0d ", div_2_8, div_3_8, div_4_8, div_5_8, div_6_8, div_7_8);
-//$display("Dividend %0d, Divisor %0d: ", dividend, divisor);
-//if (pc > 21) begin
-if (dividend<<3 > divisor<<3)   divider   = 4'b1000;
-else if (dividend<<3 > div_7_8) divider   = 4'b0111; // cosine sim = 1.00
-else if (dividend<<3 > div_6_8) divider   = 4'b0110; // cosine sim = 0.875
-else if (dividend<<3 > div_5_8) divider   = 4'b0101; // cosine sim = 0.75
-else if (dividend<<3 > div_4_8) divider   = 4'b0100; // cosine sim = 0.625
-else if (dividend<<3 > div_3_8) divider   = 4'b0011; // cosine sim = 0.50
-else if (dividend<<3 > div_2_8) divider   = 4'b0010; // cosine sim = 0.375
-else if (dividend<<3 > div_1_8) divider   = 4'b0001; // cosine sim = 0.25
-else if (dividend<<3 > 0)       divider   = 4'b0000; // cosine sim = 0.125
+
+
+if (dividend<<3 > divisor<<3)   divider   = 4'b1000; // cosine sim = 1.00
+else if (dividend<<3 > div_7_8) divider   = 4'b0111; // cosine sim = 0.875
+else if (dividend<<3 > div_6_8) divider   = 4'b0110; // cosine sim = 0.75
+else if (dividend<<3 > div_5_8) divider   = 4'b0101; // cosine sim = 0.625
+else if (dividend<<3 > div_4_8) divider   = 4'b0100; // cosine sim = 0.50
+else if (dividend<<3 > div_3_8) divider   = 4'b0011; // cosine sim = 0.375
+else if (dividend<<3 > div_2_8) divider   = 4'b0010; // cosine sim = 0.25
+else if (dividend<<3 > div_1_8) divider   = 4'b0001; // cosine sim = 0.125
+else if (dividend<<3 > 0)       divider   = 4'b0000; // cosine sim = 0.0
 else 			     divider   = 4'b0000; // cosine sim = 0;
 //$display("QUOTIENT %0b: ", divider);
+//
+////$display ("div_2_8: %0d, div_3_8: %0d, div_4_8: %0d, div_5_8: %0d, div_6_8: %0d, div_7_8: %0d ", div_2_8, div_3_8, div_4_8, div_5_8, div_6_8, div_7_8);
+//$display("Dividend %0d, Divisor %0d: ", dividend, divisor);
+//if (pc > 21) begin
+
 //end
 endfunction
 
