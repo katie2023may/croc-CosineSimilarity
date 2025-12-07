@@ -9,7 +9,7 @@ module tb_control_store_random();
     logic [15:0] cosine_similarity;
 
     // Test vars.
-    int NUM_TESTS = 200;
+    int NUM_TESTS = 500;
     int pass = 0;
     real pass_rate;
     logic [15:0] expected;
@@ -59,15 +59,15 @@ module tb_control_store_random();
             if ($urandom_range(0, 9) == 0) begin
                 A_vec = random_vec();
                 B_vec = A_vec;
-                $display("\n--- Test %0d (same vector case) ---", t);
+                // $display("\n--- Test %0d (same vector case) ---", t);
             end
             else begin
                 A_vec = random_vec();
                 B_vec = random_vec();
-                $display("\n--- Test %0d ---", t);
+                // $display("\n--- Test %0d ---", t);
             end
 
-            $display("A_vec = %h | B_vec = %h", A_vec, B_vec);
+            // $display("A_vec = %h | B_vec = %h", A_vec, B_vec);
 
             // Start pulse
             start = 1'b1;
@@ -82,9 +82,10 @@ module tb_control_store_random();
 
             if (cosine_similarity === expected) begin
                 pass++;
-                $display("PASS: DUT = %0d   REF = %0d", cosine_similarity, expected);
+                // $display("PASS: DUT = %0d   REF = %0d", cosine_similarity, expected);
             end else begin
-                $display("DUT = %0d     REF = %0d", cosine_similarity, expected);
+                $display("FAIL: DUT = %0d     REF = %0d", cosine_similarity, expected);
+                $display("A_vec = %h | B_vec = %h", A_vec, B_vec);
             end
 
             @(posedge clk);
@@ -92,44 +93,18 @@ module tb_control_store_random();
 
         #100;
         pass_rate = (pass / NUM_TESTS) * 100;
-        $display("\n=== SUMMARY ===");
+        $display("\n===== SUMMARY =====");
         $display("Total Tests = %0d", NUM_TESTS);
         $display("Passed      = %0d", pass);
-        $display("Pass Rate   = %f", pass_rate);
+        $display("Pass Rate   = %.2f", pass_rate);
         $display("====================\n");
 
         $finish;
     end
 
     /***** Reference Model *****/
-
-    int scaled;
-    // Function to quantize the output to 0 --> 8
-    function automatic logic [15:0] quantized_cosim (
-        int numerator, 
-        int denominator
-    );
-        // Numerator = dot product
-        // Denom = magA + magB
-
-        if (denominator == 0) begin 
-            return 16'd1;
-        end
-
-        scaled = $rtoi((numerator * 1000.0) / real'(denominator) + 0.5 );
-
-        if (scaled >= 1000) return 16'd8;
-        else if (scaled >= 875) return 16'd7;
-        else if (scaled >= 750) return 16'd6;
-        else if (scaled >= 625) return 16'd5;
-        else if (scaled >= 500) return 16'd4;
-        else if (scaled >= 375) return 16'd3;
-        else if (scaled >= 250) return 16'd2;
-        else return 16'd1;
-
-    endfunction
-
     // Function to compute consine sim using plain SysVer
+    // Model Excel test sheet
     function automatic logic [15:0] ref_cosine (
         input [31:0] A,
         input [31:0] B
@@ -139,11 +114,16 @@ module tb_control_store_random();
         int dot = 0;
         int magA = 0;
         int magB = 0;
-        int a = 0;
-        int b = 0;
+        int sqrtA, sqrtB;
+        int a, b;
+        int ref_val = 0;
         int denom = 0;
+        int level = 1;
 
-        // Cosine Similarity algorithm
+        // Scaled by 1000 (to get rid of decimals)
+        int frac [1:8] = '{125, 250, 375, 500, 625 ,750, 875, 1000};
+
+        // Compute MagA, MagB, and Dot_prod A*B
         for (int i = 0; i < 4; i++) begin
             a = (A >> (i * 8)) & 8'hFF;
             b = (B >> (i * 8)) & 8'hFF;
@@ -153,10 +133,36 @@ module tb_control_store_random();
             magB += b * b;        
         end
 
-        denom = $rtoi($sqrt(magA) * $sqrt(magB));
+        // int(sqrtA) and int(sqrtB)
+        sqrtA = $rtoi($sqrt(magA));
+        sqrtB = $rtoi($sqrt(magB));
 
-        return quantized_cosim(dot, denom);
+        // Max threshold test
+        for (int i = 1; i <= 8; i++) begin
+            ref_val = (frac[i] * sqrtA * sqrtB);
+
+            if ((dot*1000) >= ref_val) begin
+               level = i; 
+            end
+        end
+
+        return level;
 
     endfunction
 
 endmodule
+
+
+// Pseudo code for the reference model from Excel sheet
+/*
+
+(1) Compute A * A = int = AA
+(2) Compute B * B = int == BB
+(3) Compute dot product int(A * B) = AB
+
+(4) Compute Reference Value = Fraction * int(Sqrt(AA) * sqrt(BB))
+(5) If AB > Reference value --> That output value = fraction; else, 0
+
+(6) Find the max output value
+
+*/
