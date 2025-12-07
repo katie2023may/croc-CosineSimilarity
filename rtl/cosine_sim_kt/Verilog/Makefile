@@ -8,7 +8,9 @@ OUT      = a.out
 sim_directed:
 	$(IVERILOG) -g2012 control_store.sv tb_control_store_directed.sv
 	$(VVP) $(OUT)
-
+sim_random:
+	$(IVERILOG) -g2012 control_store.sv tb_control_store_random.sv
+	$(VVP) $(OUT)
 clean:
 	rm -f $(OUT)
 
